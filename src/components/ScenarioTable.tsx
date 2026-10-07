@@ -52,6 +52,8 @@ export const ScenarioTable: React.FC<ScenarioTableProps> = ({
   onReorderRows,
 }) => {
   const { columnWidths, startResizing } = useColumnResize([180, 480, 240]);
+  // 操作列(60) + 3列 + 挿入列(40)。これ未満の画面幅では横スクロールにする
+  const tableMinWidth = 60 + columnWidths[0] + columnWidths[1] + columnWidths[2] + 40;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -77,6 +79,10 @@ export const ScenarioTable: React.FC<ScenarioTableProps> = ({
 
   return (
     <div className="bg-slate-900/80 border border-slate-800 rounded-xl shadow-2xl overflow-hidden backdrop-blur-md">
+      {/* Horizontal scroll container: lets all 3 columns be reached on narrow (mobile) screens.
+          Header and rows live in the same inner box so they scroll together. */}
+      <div className="overflow-x-auto overscroll-x-contain">
+      <div style={{ minWidth: `${tableMinWidth}px` }}>
       {/* Table Header */}
       <div className="flex items-center bg-slate-950/80 border-b border-slate-800 text-xs font-semibold text-slate-400 uppercase tracking-wider select-none">
         {/* Margin header for control buttons */}
@@ -160,6 +166,8 @@ export const ScenarioTable: React.FC<ScenarioTableProps> = ({
           </div>
         </SortableContext>
       </DndContext>
+      </div>
+      </div>
 
       {/* Table Footer / Quick Add Row */}
       <div className="p-3 bg-slate-950/40 border-t border-slate-800/80 flex items-center justify-between">

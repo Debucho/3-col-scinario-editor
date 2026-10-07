@@ -65,7 +65,7 @@ export const ScenarioRowComponent: React.FC<ScenarioRowProps> = ({
       }`}
     >
       {/* Drag & Delete Control Margin */}
-      <div className="flex items-center px-1 border-r border-slate-800 bg-slate-950/60 shrink-0 space-x-0.5">
+      <div className="flex items-center justify-center w-[60px] px-1 border-r border-slate-800 bg-slate-950/60 shrink-0 space-x-0.5">
         {/* D&D Handle */}
         <button
           {...attributes}
@@ -154,7 +154,7 @@ export const ScenarioRowComponent: React.FC<ScenarioRowProps> = ({
       </div>
 
       {/* Insert Row Button Right of Column 3 */}
-      <div className="flex items-center px-1.5 bg-slate-950/40 shrink-0">
+      <div className="flex items-center justify-center w-[40px] px-1.5 bg-slate-950/40 shrink-0">
         <button
           onClick={() => onInsertRowBelow(rowIndex)}
           title="下に新しい行を挿入 (+)"
