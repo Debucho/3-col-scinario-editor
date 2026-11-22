@@ -1,54 +1,92 @@
-# React + TypeScript + Vite
+# 3列シナリオエディタ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+台本・シナリオを「話者 / セリフ / ト書き・備考」の 3 列の表で書くためのエディタです。
+演劇、映像、ゲーム、ボイスドラマなどの脚本づくりを想定しています。
+Windows 向けのデスクトップアプリ（Electron）として動くほか、ブラウザでも使えます（PWA 対応）。
 
-Currently, two official plugins are available:
+## 主な機能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **3 列での編集**：誰が（話者）、何を話し（セリフ）、どう動くか（ト書き）を分けて入力できます。
+- **キーボード中心の操作**：矢印キー・Enter・Tab だけでセルを移動しながら書き進められます。
+- **登場人物の管理と入力補完**：登場人物を登録しておくと、話者列で候補が出るので表記ゆれを防げます。
+- **行の並べ替え・挿入・削除**：ドラッグ＆ドロップで行を並べ替えられます。
+- **列幅の調整**：見出しの境界線をドラッグして列幅を変えられます。
+- **ファイルの入出力**
+  - 独自形式（`.snrioprj`、中身は JSON）での保存・読み込み
+  - テキスト（`.txt`、`話者「セリフ」【ト書き】` 形式）の取り込み・書き出し
+- **AI アシスタント**：OpenAI、Google Gemini、ローカル LLM（Ollama など OpenAI 互換 API）に接続し、続きや展開案を生成して表に直接反映できます。
 
-## Expanding the ESLint configuration
+## ダウンロード
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Windows 版の実行ファイルは [Releases](../../releases) から入手できます。
+zip を展開し、`3列シナリオエディタ.exe` を起動してください。インストールは不要です。
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## キーボードショートカット
+
+| キー | 動作 |
+| :--- | :--- |
+| `↑` `↓` `←` `→` | セルを移動 |
+| `Enter` | 編集を開始／確定して下のセルへ（最終行では行を追加） |
+| `Shift + Enter` | 確定して直下のセルへ移動 |
+| `Tab` / `Shift + Tab` | 右／左のセルへ移動（話者列では補完候補を決定） |
+| `Esc` | 編集を確定して選択状態に戻る |
+| `Ctrl + Z` / `Ctrl + Y` | 元に戻す／やり直し |
+| `Ctrl + Shift + A` | AI アシスタントの表示・非表示 |
+
+## AI アシスタントの設定
+
+AI アシスタント（`Ctrl + Shift + A`）を開き、右上の歯車アイコンからプロバイダーを選びます。
+
+| プロバイダー | 必要な設定 |
+| :--- | :--- |
+| シミュレーション | なし（動作確認用のダミー応答） |
+| OpenAI | API キー、モデル名 |
+| Gemini | API キー、モデル名 |
+| カスタム／ローカル | ベース URL（例：`http://localhost:11434/v1`）、モデル名 |
+
+### Ollama を使う場合
+
+1. [Ollama](https://ollama.com) をインストールし、モデルを取得します（例：`ollama pull qwen2.5`）。
+2. ブラウザ版から接続する場合は、環境変数 `OLLAMA_ORIGINS` を設定して Ollama を再起動します（CORS エラー対策）。
+3. エディタの設定で「カスタム／ローカル」を選び、ベース URL に `http://localhost:11434/v1`（末尾の `/v1` が必要）、モデル名に取得したモデル名を入力します。
+
+### API キーの扱いについて
+
+- API キーは、お使いの PC（ブラウザの localStorage）に保存されます。外部に送信されるのは、選んだ AI プロバイダーへのリクエスト時だけです。
+- プロジェクトファイル（`.snrioprj`）には API キーを書き込みません。ファイルを他人に渡しても、キーは渡りません。
+
+## 開発
+
+必要なもの：Node.js 20 以降
+
+```bash
+npm install
+
+# ブラウザで開発（http://localhost:5173）
+npm run dev
+
+# Electron で開発
+npm run electron:dev
+
+# Web 版のビルド（dist/ に出力）
+npm run build
+
+# Windows 版のパッケージ作成（release/ に出力）
+npm run electron:build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 構成
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
 ```
+electron/main.cjs     Electron のメインプロセス
+src/components/       画面の部品（表、セル編集、AI ドロワーなど）
+src/hooks/            状態管理（シナリオデータ、Undo/Redo、列幅）
+src/utils/            AI 連携、ファイルの入出力、テキストの取り込み・書き出し
+src/types/            型定義
+```
+
+使用技術：React 19 / TypeScript / Vite / Tailwind CSS / dnd-kit / Electron
+
+## ライセンス
+
+[MIT License](LICENSE)

@@ -52,7 +52,15 @@ export function App() {
   });
 
   // Active AI config prioritized from loaded project, fallback to local storage / default
-  const activeAiConfig = project.aiConfig || localAiConfig;
+  // Project files are saved without the API key, so reuse the locally stored key for the same provider
+  const activeAiConfig: AiConfig = project.aiConfig
+    ? {
+        ...project.aiConfig,
+        apiKey:
+          project.aiConfig.apiKey ||
+          (project.aiConfig.provider === localAiConfig.provider ? localAiConfig.apiKey : ''),
+      }
+    : localAiConfig;
 
   const handleSaveAiConfig = (newConfig: AiConfig) => {
     setLocalAiConfig(newConfig);

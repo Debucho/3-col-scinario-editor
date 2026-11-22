@@ -8,6 +8,8 @@ export function saveProjectFile(project: ScenarioProject): void {
       ...project.metadata,
       updatedAt: new Date().toISOString(),
     },
+    // APIキーはファイルを共有したときに漏れないよう保存しない（キーは各PCのlocalStorageに保持）
+    aiConfig: project.aiConfig ? { ...project.aiConfig, apiKey: '' } : undefined,
   };
 
   const jsonString = JSON.stringify(updatedProject, null, 2);
